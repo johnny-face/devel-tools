@@ -4,19 +4,20 @@
 #2015/24/02
 import psutil
 import re
+import ConfigParser
 
 class BaseInfo(object):
     def __init__(self):
         pass
 
-    #内存使用率
+    #Memory rate
     def getMen(self):
         totalMen = float(psutil.virtual_memory().total/1024/1024)
         useMen = float(psutil.virtual_memory().used/1024/1024)
         usedMen = int(useMen/totalMen * 100)
         return usedMen
 
-    #CPU使用率
+    #CPU rate
     def getCpu(self):
         idle = "idle"
         logicalCpu = psutil.cpu_count()
@@ -30,11 +31,21 @@ class BaseInfo(object):
             return float(use_rate.group(1))
 
 
-    #Disk使用率
-    def getDisk(self):
-        print "disk"
+    #Disk rate
+    def getDisk(self, path):
+        diskUse = psutil.disk_usage(path)
+        use_Rate = int(float(diskUse.free) / float(diskUse.total) * 100)
+        return use_Rate
+
+    #conf file resolve
+    def getResolve(self, module, items):
+        configParser = ConfigParser.ConfigParser()
+        configParser.read("info.conf")
+        getPath = configParser.get(module, items)
+        return getPath
+
 
 if __name__ == "__main__":
     info = BaseInfo()
-    print info.getMen()
-    print info.getCpu()
+    rootPath = info.getResolve("disk", "root")
+    print info.getDisk(rootPath)
