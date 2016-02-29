@@ -13,7 +13,8 @@ class ReportInfo(object):
         info = getInfo.BaseInfo()
         process = processInfo.ProcessInfo()
         hostinfo = info.hostInfo()
-        print hostinfo
+        for x in hostinfo:
+            print x
         rate = process.monitorInfo()
         print rate
 
