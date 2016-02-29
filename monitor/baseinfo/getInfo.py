@@ -1,9 +1,11 @@
 #encoding=utf-8
 # __author__ = 'johnny'
 #This script is get the system info exp CPU Men Disk &
-#2015/24/02
+#2016/24/02
 import psutil
 import re
+import subprocess
+import socket
 import ConfigParser
 
 class BaseInfo(object):
@@ -28,7 +30,7 @@ class BaseInfo(object):
         search_out = re.compile(r''+ idle +'\s*=\s*(\d+)')
         use_rate = search_out.search(strResult)
         if use_rate != None:
-            return float(use_rate.group(1))
+            return int(use_rate.group(1))
 
 
     #Disk rate
@@ -44,8 +46,17 @@ class BaseInfo(object):
         getPath = configParser.get(module, items)
         return getPath
 
-
-if __name__ == "__main__":
-    info = BaseInfo()
-    rootPath = info.getResolve("disk", "root")
-    print info.getDisk(rootPath)
+    #Host info
+    def hostInfo(self):
+        hostname = socket.gethostname()
+        ipstr = '([0-9]{1,3}\.){3}[0-9]{1,3}'
+        ipconfig_process = subprocess.Popen("ifconfig", stdout=subprocess.PIPE)
+        output = ipconfig_process.stdout.read()
+        ip_pattern = re.compile('(inet addr:%s)' % ipstr)
+        pattern = re.compile(ipstr)
+        iplist = []
+        for ipaddr in re.finditer(ip_pattern, str(output)):
+            ip = pattern.search(ipaddr.group())
+            if ip.group() != "127.0.0.1":
+                iplist.append(ip.group())
+        return hostname, iplist
