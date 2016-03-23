@@ -24,4 +24,4 @@ class ProcessInfo(object):
             use_space.append(disk_use)
 
         if cpuInfo >= 20 or menInfo <= 70 or min(use_space) <= 98:
-            return menInfo, cpuInfo, use_space
+            return False
